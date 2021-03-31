@@ -11,6 +11,16 @@ namespace Intel_Internship
                 public string aAirport;
                 public string dTime;
                 public string aTime;
+                public Flight()
+                {
+                    seatingCapacity = 0;
+                    pFirst = 0;
+                    pEconomy = 0;
+                    dAirport = "Nowhere";
+                    aAirport = "Nowhere";
+                    dTime = "Never";
+                    aTime = "Never";
+                }
                 public Flight(int sc, int pf, int pe, string da, string aa, string dt, string at)
                 {
                     seatingCapacity = sc;
@@ -21,6 +31,22 @@ namespace Intel_Internship
                     dTime = dt;
                     aTime = at;
                 }
+    }
+
+    public class Customer
+    {
+        public string name;
+        public int age;
+        public Customer()
+        {
+            name = "John Doe";
+            age = 0;
+        }
+        public Customer(string n, int a)
+        {
+            name = n;
+            age = a;
+        }
     }
     class Airline
     {
