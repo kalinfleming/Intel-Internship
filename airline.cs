@@ -9,9 +9,9 @@ namespace Intel_Internship
                 public int pEconomy;
                 public string dAirport;
                 public string aAirport;
-                public int dTime;
-                public int aTime;
-                public Flight(int sc, int pf, int pe, string da, string aa, int dt, int at)
+                public string dTime;
+                public string aTime;
+                public Flight(int sc, int pf, int pe, string da, string aa, string dt, string at)
                 {
                     seatingCapacity = sc;
                     pFirst = pf;
@@ -26,42 +26,35 @@ namespace Intel_Internship
     {
         static void Main(string[] args)
         {
-            string a;
-            string b;
-            string c;
-            string d;
-            string e;
-            string f;
-            string g;
             int one;
             int two;
             int three;
-            int four;
-            int five;
+            string four;
+            string five;
+            string six;
+            string seven;
             Console.Write("Enter a seating capacity - ");
-            a = Console.ReadLine();
-            one = Convert.ToInt32(a);
+            one = Convert.ToInt32(Console.ReadLine());
             Console.Write("Enter price of 1st class ticket - ");
-            b = Console.ReadLine();
-            two = Convert.ToInt32(b);
+            two = Convert.ToInt32(Console.ReadLine());
             Console.Write("Enter price of economy ticket - ");
-            c = Console.ReadLine();
-            three = Convert.ToInt32(c);
+            three = Convert.ToInt32(Console.ReadLine());
             Console.Write("Enter departure airport - ");
-            d = Console.ReadLine();
+            four = Console.ReadLine();
             Console.Write("Enter arrival airport - ");
-            e = Console.ReadLine();
+            five = Console.ReadLine();
             Console.Write("Enter departure time - ");
-            f = Console.ReadLine();
-            four = Convert.ToInt32(f);
+            six = Console.ReadLine();
             Console.Write("Enter arrival time - ");
-            g = Console.ReadLine();
-            five = Convert.ToInt32(g);
-            Console.WriteLine("Hello World!");
-            Flight obj = new Flight(10, 100, 30, "DFW", "GSO", 850, 1050);
-            Flight myObj = new Flight(one, two, three, d, e, four, five);
-            Console.WriteLine("Flight Capacity: {0}", obj.seatingCapacity);
+            seven = Console.ReadLine();
+            Flight myObj = new Flight(one, two, three, four, five, six, seven);
             Console.WriteLine("Flight Capacity: {0}", myObj.seatingCapacity);
+            Console.WriteLine("Price of First Class Ticket: {0}", myObj.pFirst);
+            Console.WriteLine("Price of Economy Ticket: {0}", myObj.pEconomy);
+            Console.WriteLine("Departure Airport: {0}", myObj.dAirport);
+            Console.WriteLine("Arrival Airport: {0}", myObj.aAirport);
+            Console.WriteLine("Departure Time: {0}", myObj.dTime);
+            Console.WriteLine("Arrival Time: {0}", myObj.aTime);
         }
     }
 }
