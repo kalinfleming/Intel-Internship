@@ -1,0 +1,15 @@
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.csprojAssemblyReference.cache
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.GeneratedMSBuildEditorConfig.editorconfig
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.AssemblyInfoInputs.cache
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.AssemblyInfo.cs
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.csproj.CoreCompileInputs.cache
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/Intel-Internship.deps.json
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/Intel-Internship.runtimeconfig.json
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/Intel-Internship.runtimeconfig.dev.json
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/Intel-Internship.dll
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/ref/Intel-Internship.dll
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/bin/Debug/net5.0/Intel-Internship.pdb
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.dll
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/ref/Intel-Internship.dll
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.pdb
+/Users/kalinfleming/Desktop/Intel/Intel-Internship/obj/Debug/net5.0/Intel-Internship.genruntimeconfig.cache
