@@ -1,4 +1,5 @@
-Capacity: 300, 1st Class Ticket Price: 200, Economy Ticket Price: 300, Departure Airport: DFW, Arrival Airport: GSO, Departure Time: 10:33, Arrival Time: 15:44
-Capacity: 300, 1st Class Ticket Price: 200, Economy Ticket Price: 100, Departure Airport: GSO, Arrival Airport: DFW, Departure Time: 20:33, Arrival Time: 3:22
-Capacity: 300, 1st Class Ticket Price: 200, Economy Ticket Price: 300, Departure Airport: DFW, Arrival Airport: GSO, Departure Time: 2:33, Arrival Time: 9:00
-Capacity: 200, 1st Class Ticket Price: 300, Economy Ticket Price: 200, Departure Airport: JKF, Arrival Airport: LKS, Departure Time: 3:33, Arrival Time: 4:44
+6 200 100 DFW GSO 10:30 3:30
+12 300 200 LAX BOS 6:30 4:40
+30 450 350 LAX DFW 2:35 8:55
+300 200 100 DFW LAX 3:30 4:40
+30 300 150 LAX BOS 2:30 10:30
