@@ -1,4 +1,16 @@
-﻿using System;
+﻿/* 
+Kalin Fleming
+Intel Internship Airline Project
+04/07/2021
+Description: This program simulates an Airline website. The user can either be a customer or an administrator. The administrator
+can create flights by inputting different flight descriptions. The program will store all flights into a text file named
+"flights.txt". The customer can reserve a seat on a flight. The customer will be able to see a list of flights available
+with the relevant descriptions and reserve a seat. If customers attempt to book the same seat in the same program simulation,
+the customer will have to choose a different seat. 
+*/
+
+/* import files */
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
@@ -7,6 +19,9 @@ using System.Linq;
 
 namespace Intel_Internship
 {
+    /* Flight class. This class contains all data pertaining to a flight, function to generate a seating chart,
+    function to create a user-friendly string of flight information, function to keep track of seat reservations,
+    and lastly a function to print out a seating chart to the user */
     public class Flight
     {
                 public int seatingCapacity;
@@ -96,6 +111,8 @@ namespace Intel_Internship
                 }
     }
     
+    /* Database class. This class contains a list of all flights, an integer to store
+    the current number of flights, and a function to add a flight to the list */
     public class Database
     {
         public int numFlights;
@@ -112,7 +129,7 @@ namespace Intel_Internship
         }
     }
     
-
+    /* Customer class. This class contains a customer's information such as the name and age */
     public class Customer
     {
         public string name;
@@ -129,6 +146,8 @@ namespace Intel_Internship
         }
     }
     
+    /* Writer class. This class writes flight information to the "flights.txt" file in order
+    to maintain a list of flights across program instances */
     public class Writer
     {
         public static async Task WriteAsync(Flight f)
@@ -138,8 +157,12 @@ namespace Intel_Internship
         }
     }
 
+    /* Reader class. This class contains a function that will read a list of all past flights
+    from the "flights.txt" file and add it to the current database, a function to print out a
+    list of current flights, and a function to print out a specific flight given by the user */
     public class Reader
     {
+        /* Read all flights from text file, add flights to flight database */
         public static void firstRead(Database d)
         {
             int count = 0;
@@ -179,6 +202,8 @@ namespace Intel_Internship
                 obj.createSeatingChart();
             }
         }
+
+        /* Read an output all flights for customer to choose */
         public static void ReadAll(Database d)
         {
             string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
@@ -196,6 +221,7 @@ namespace Intel_Internship
             Console.WriteLine(format);
         }
 
+        /* Read and output specific flight information for customer */
         public static void ReadSpecific(Database d, int x)
         {
             Console.WriteLine("");
@@ -209,34 +235,32 @@ namespace Intel_Internship
         }
     }
 
+    /* Airline class. This class contains our main program which simulates an airline reservation website */
     class Airline
     {
         static void Main(string[] args)
         {
-            int one;
-            int two;
-            int three;
-            string four;
-            string five;
-            string six;
-            string seven;
-            string person;
-            string cName;
-            int cAge;
+            /* Initializing variables */
+            int capacity, fticket, eticket, cAge;
+            string dairport, aairport, dtime, atime, person, cName;
             int prompt = 0;
             int c = 0;
             int validSeat = 0;
             string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 
+            /* Creating database and receiving input from "flights.txt" file */ 
             Database d = new Database();
             Reader.firstRead(d);
             
+            /* Initial prompt */
             Console.WriteLine(format);
             Console.Write("Hello! Welcome to the Booking Portal. Are you a customer or administrator? ");
             person = Console.ReadLine();
             person = person.ToLower();
 
+            /* Keep iterating through program until user is done */
             while (c == 0) { 
+                /* Ensuring user gives proper input */
                 while (prompt == 0) {
                     if ((person.Equals("administrator")) || (person.Equals("customer"))) {
                         prompt = 1;
@@ -247,40 +271,48 @@ namespace Intel_Internship
                         person = person.ToLower();
                     }
                 }
+                /* When user is an administrator */
                 if(person.Equals("administrator")) 
                 {
+                    /* Documenting flight data from administrator */
                     Console.WriteLine(format);
                     Console.Write("Enter a seating capacity - ");
-                    one = Convert.ToInt32(Console.ReadLine());
+                    capacity = Convert.ToInt32(Console.ReadLine());
                     Console.Write("Enter price of 1st class ticket - $");
-                    two = Convert.ToInt32(Console.ReadLine());
+                    fticket = Convert.ToInt32(Console.ReadLine());
                     Console.Write("Enter price of economy ticket - $");
-                    three = Convert.ToInt32(Console.ReadLine());
+                    eticket = Convert.ToInt32(Console.ReadLine());
                     Console.Write("Enter departure airport - ");
-                    four = Console.ReadLine();
+                    dairport = Console.ReadLine();
                     Console.Write("Enter arrival airport - ");
-                    five = Console.ReadLine();
+                    aairport = Console.ReadLine();
                     Console.Write("Enter departure time (XX:XX) - ");
-                    six = Console.ReadLine();
+                    dtime = Console.ReadLine();
                     Console.Write("Enter arrival time (XX:XX) - ");
-                    seven = Console.ReadLine();
+                    atime = Console.ReadLine();
                     Console.WriteLine(format);
-                    Flight myObj = new Flight(one, two, three, four, five, six, seven);
+                    /* Creating the specified flight, adding the flight to the database, and writing the flight to a file */
+                    Flight myObj = new Flight(capacity, fticket, eticket, dairport, aairport, dtime, atime);
                     d.addFlight(myObj);
                     Writer.WriteAsync(myObj);
                 }
+                /* When user is a customer */
                 else if(person.Equals("customer")) {
+                    /* Documenting customer information */
                     Console.Write("Please enter your first and last name - ");
                     cName = Console.ReadLine();
                     Console.Write("Please enter your age - ");
                     cAge = Convert.ToInt32(Console.ReadLine());
+                    /* Printing out flight list, asking customer what flight they would like */
                     Reader.ReadAll(d);
                     Console.Write("Which flight would you like? (Just put the flight number) - ");
                     int num = Convert.ToInt32(Console.ReadLine());
+                    /* Printing out specific flight and confirming with customer */
                     Reader.ReadSpecific(d, num);
                     Console.Write("Is this flight correct? (Y/N) - ");
                     string a = Console.ReadLine();
                     bool pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
+                    /* Keep asking customer to choose a flight until they are satisfied with their choice */
                     while(!pequal) {
                         Reader.ReadAll(d);
                         Console.Write("Which flight would you like? (Just put the flight number) - ");
@@ -290,29 +322,35 @@ namespace Intel_Internship
                         a = Console.ReadLine();
                         pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
                     }
+                    /* Print seating chart and ask customer what seat they would like */
                     d.database[num-1].printSeating();
                     Console.Write("You may now pick your seat. Which seat number would you like? (Just put the seat number) - ");
                     int n = Convert.ToInt32(Console.ReadLine());
                     validSeat = d.database[num-1].takenSeat(n);
+                    /* If that seat has been taken, keep asking customer what seat they would like until they make a valid choice */
                     while (validSeat==0) {
                         d.database[num-1].printSeating();
                         Console.WriteLine("Sorry. That seat is taken. Please select an open seat (Just put the seat number) - ");
                         n = Convert.ToInt32(Console.ReadLine());
                         validSeat = d.database[num-1].takenSeat(n);
                     }
+                    /* Printing out seat number */
                     Console.WriteLine("");
                     Console.Write("You have picked seat number: " + n);
                     Console.WriteLine(". You are all set and your seat is reserved.");
                 }
+                /* Determining if user would like to continue to create/book flights */
                 Console.WriteLine("");
                 Console.Write("Would you like to continue? (Y/N) - ");
                 string response = Console.ReadLine();
                 bool equal = String.Equals("Y", response, StringComparison.OrdinalIgnoreCase);
+                /* Exiting the program */
                 if (!equal) {
                     c = 1;
                     Console.WriteLine("Please come again. Have a great day!");
                     Console.WriteLine(format);
                 }
+                /* Re-printing initial prompt */
                 else {
                     Console.WriteLine(format);
                     Console.Write("Hello! Welcome to the Booking Portal. Are you a customer or administrator? ");
