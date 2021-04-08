@@ -31,7 +31,8 @@ namespace Intel_Internship
                 public string aAirport;
                 public string dTime;
                 public string aTime;
-                int[] seatChart;
+                public int idNum;
+                public int[] seatChart;
                 
                 public Flight()
                 {
@@ -60,11 +61,9 @@ namespace Intel_Internship
                     }
                 }
 
-                public void createSeatingChart() {
-                    seatChart = new int[seatingCapacity];
-                    for (int i = 0; i < seatingCapacity; i++) {
-                        seatChart[i] = 0;
-                    }
+                public void createSeatingChart(Database database, Flight f) {
+                    f.seatChart = new int[seatingCapacity];
+                    Reader.ReadSeating(database, f);
                 }
 
                 public string flightDetails()
@@ -75,13 +74,33 @@ namespace Intel_Internship
 
                 public int takenSeat(int x) 
                 {
-                    if (seatChart[x-1] == 0) {
-                        seatChart[x-1] = 1;
-                        return 1;
+                    int result = 0;
+                    if (x>seatingCapacity) {
+                        result = 3;
+                        return result;
+                    }
+                    if (seatChart[x-1] == x) {
+                        seatChart[x-1] = 0;
+                        result = 1;
+                        return result;
                     }
                     else {
-                        return 0;
+                        return result;
                     }
+                }
+
+                public int fullFlight() 
+                {
+                    int result = 1;
+                    for (int i = 0; i < seatingCapacity; i++) {
+                        if (seatChart[i] == (i+1)) {
+                            result = 0;
+                        }
+                    }
+                    if (result != 0) {
+                        result = 1;
+                    }
+                    return result;
                 }
 
                 public void printSeating()
@@ -96,10 +115,10 @@ namespace Intel_Internship
                         else if (i != 0 && i%6 == 0) {
                             Console.WriteLine(" ");
                         }
-                        if (seatChart[i] == 0 && i < 10) {
+                        if (seatChart[i] == (i+1) && i < 10) {
                             Console.Write(i+1 + "    ");
                         }
-                        else if (seatChart[i] == 0 && i >=10) {
+                        else if (seatChart[i] == (i+1) && i >=10) {
                             Console.Write(i+1 + "   ");
                         }
                         else {
@@ -108,6 +127,13 @@ namespace Intel_Internship
                     }
                     Console.WriteLine("");
                     Console.WriteLine(format);
+                }
+
+                public void cleanOut()
+                {
+                    for (int i = 0; i < seatingCapacity; i++) {
+                        seatChart[i] = (i+1);
+                    }
                 }
     }
     
@@ -126,6 +152,13 @@ namespace Intel_Internship
         {
             database.Add(f);
             numFlights++;
+        }
+
+        public void clean()
+        {
+            for (int i = 0; i < numFlights; i++) {
+                database[i].cleanOut();
+            }
         }
     }
     
@@ -154,6 +187,30 @@ namespace Intel_Internship
         {
             using StreamWriter file = new("flights.txt", append: true);
             await file.WriteLineAsync(f.seatingCapacity + " " + f.pFirst + " " + f.pEconomy + " " + f.dAirport + " " + f.aAirport + " " + f.dTime + " " + f.aTime);
+            string name = "flight" + f.idNum + ".txt";
+            using (FileStream fs = new FileStream(name, FileMode.Create))
+            {
+                using (BinaryWriter w = new BinaryWriter(fs))
+                {
+                    for (int i = 0; i < f.seatingCapacity; i++) {
+                        w.Write(i+1);
+                    }
+                }
+            }
+        }
+
+        public static async Task ChangeSeat(Flight f)
+        {
+            string name = "flight" + f.idNum + ".txt";
+            using (FileStream fs = new FileStream(name, FileMode.Create))
+            {
+                using (BinaryWriter w = new BinaryWriter(fs))
+                {
+                    for (int i = 0; i < f.seatingCapacity; i++) {
+                        w.Write(f.seatChart[i]);
+                    }
+                }
+            }
         }
     }
 
@@ -199,26 +256,27 @@ namespace Intel_Internship
                 }
                 obj.aTime = sub;
                 d.addFlight(obj);
-                obj.createSeatingChart();
+                obj.idNum = d.numFlights;
+                obj.createSeatingChart(d, obj);
             }
         }
 
         /* Read an output all flights for customer to choose */
         public static void ReadAll(Database d)
         {
-            string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
-            Console.WriteLine(format);
-            Console.WriteLine("Here is a current list of flights available: ");
-            Console.WriteLine("");
-            for (int i = 0; i < d.numFlights; i++) {
-                Console.WriteLine("Flight " + (i+1) + ": ");
-                Console.WriteLine(d.database[i].flightDetails());
-                if (i < (d.numFlights-1)) {
-                    Console.WriteLine("");
+                string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
+                Console.WriteLine(format);
+                Console.WriteLine("Here is a current list of flights available: ");
+                Console.WriteLine("");
+                for (int i = 0; i < d.numFlights; i++) {
+                    Console.WriteLine("Flight " + (i+1) + ": ");
+                    Console.WriteLine(d.database[i].flightDetails());
+                    if (i < (d.numFlights-1)) {
+                        Console.WriteLine("");
+                    }
                 }
-            }
-            Console.WriteLine("");
-            Console.WriteLine(format);
+                Console.WriteLine("");
+                Console.WriteLine(format);
         }
 
         /* Read and output specific flight information for customer */
@@ -233,6 +291,21 @@ namespace Intel_Internship
             }
             Console.WriteLine("");
         }
+
+        public static void ReadSeating (Database d, Flight f)
+        {
+            string name = "flight" + f.idNum + ".txt";
+            using (FileStream fs = new FileStream(name, FileMode.Open, FileAccess.Read))
+            {
+                using (BinaryReader r = new BinaryReader(fs))
+                {
+                    for (int i = 0; i < f.seatingCapacity; i++) {
+                        int temp = r.ReadInt32();
+                        f.seatChart[i] = temp;
+                    }
+                }
+            }
+        }
     }
 
     /* Airline class. This class contains our main program which simulates an airline reservation website */
@@ -242,10 +315,13 @@ namespace Intel_Internship
         {
             /* Initializing variables */
             int capacity, fticket, eticket, cAge;
-            string dairport, aairport, dtime, atime, person, cName;
+            string dairport, aairport, dtime, atime, person, cName, response;
             int prompt = 0;
             int c = 0;
-            int validSeat = 0;
+            int x = 0;
+            int n = 0;
+            int validSeat = 1;
+            bool equal;
             string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
 
             /* Creating database and receiving input from "flights.txt" file */ 
@@ -290,11 +366,18 @@ namespace Intel_Internship
                     dtime = Console.ReadLine();
                     Console.Write("Enter arrival time (XX:XX) - ");
                     atime = Console.ReadLine();
-                    Console.WriteLine(format);
                     /* Creating the specified flight, adding the flight to the database, and writing the flight to a file */
                     Flight myObj = new Flight(capacity, fticket, eticket, dairport, aairport, dtime, atime);
                     d.addFlight(myObj);
+                    myObj.idNum = d.numFlights;
                     Writer.WriteAsync(myObj);
+                    Console.Write("Would you like to re-set all flights? This would delete any previous seat reservations, all of the flights would have all open seats. (Y/N) - ");
+                    response = Console.ReadLine();
+                    equal = String.Equals("Y", response, StringComparison.OrdinalIgnoreCase);
+                    if (equal) {
+                        d.clean();
+                    }
+                    Console.WriteLine(format);
                 }
                 /* When user is a customer */
                 else if(person.Equals("customer")) {
@@ -305,45 +388,71 @@ namespace Intel_Internship
                     cAge = Convert.ToInt32(Console.ReadLine());
                     /* Printing out flight list, asking customer what flight they would like */
                     Reader.ReadAll(d);
-                    Console.Write("Which flight would you like? (Just put the flight number) - ");
-                    int num = Convert.ToInt32(Console.ReadLine());
-                    /* Printing out specific flight and confirming with customer */
-                    Reader.ReadSpecific(d, num);
-                    Console.Write("Is this flight correct? (Y/N) - ");
-                    string a = Console.ReadLine();
-                    bool pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
-                    /* Keep asking customer to choose a flight until they are satisfied with their choice */
-                    while(!pequal) {
-                        Reader.ReadAll(d);
+                    if (d.numFlights == 0) {
+                        Console.WriteLine("Sorry. There are no current flights available. Please come back and check at a later time");
+                    }
+                    else {
                         Console.Write("Which flight would you like? (Just put the flight number) - ");
-                        num = Convert.ToInt32(Console.ReadLine());
+                        int num = Convert.ToInt32(Console.ReadLine());
+                        /* Printing out specific flight and confirming with customer */
                         Reader.ReadSpecific(d, num);
                         Console.Write("Is this flight correct? (Y/N) - ");
-                        a = Console.ReadLine();
-                        pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
-                    }
-                    /* Print seating chart and ask customer what seat they would like */
-                    d.database[num-1].printSeating();
-                    Console.Write("You may now pick your seat. Which seat number would you like? (Just put the seat number) - ");
-                    int n = Convert.ToInt32(Console.ReadLine());
-                    validSeat = d.database[num-1].takenSeat(n);
-                    /* If that seat has been taken, keep asking customer what seat they would like until they make a valid choice */
-                    while (validSeat==0) {
+                        string a = Console.ReadLine();
+                        bool pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
+                        /* Keep asking customer to choose a flight until they are satisfied with their choice */
+                        while(!pequal) {
+                            Reader.ReadAll(d);
+                            Console.Write("Which flight would you like? (Just put the flight number) - ");
+                            num = Convert.ToInt32(Console.ReadLine());
+                            if (num >= d.numFlights) {
+                                x = 1;
+                            }
+                            while (x==1) {
+                                Console.WriteLine("That is not a valid flight number. Please try again");
+                                Console.Write("Which flight would you like? (Just put the flight number) - ");
+                                num = Convert.ToInt32(Console.ReadLine());
+                                if (num<d.numFlights) {
+                                    x = 0;
+                                }
+                            }
+                            Reader.ReadSpecific(d, num);
+                            Console.Write("Is this flight correct? (Y/N) - ");
+                            a = Console.ReadLine();
+                            pequal = String.Equals("Y", a, StringComparison.OrdinalIgnoreCase);
+                        }
+                        /* Print seating chart and ask customer what seat they would like */
                         d.database[num-1].printSeating();
-                        Console.WriteLine("Sorry. That seat is taken. Please select an open seat (Just put the seat number) - ");
+                        Console.Write("You may now pick your seat. Which seat number would you like? (Just put the seat number) - ");
                         n = Convert.ToInt32(Console.ReadLine());
                         validSeat = d.database[num-1].takenSeat(n);
+                        /* If that seat has been taken, keep asking customer what seat they would like until they make a valid choice */
+                        while (validSeat==3) {
+                            d.database[num-1].printSeating();
+                            Console.Write("That is not a valid seat number. Please pick a valid seat (Just put the seat number) - ");
+                            n = Convert.ToInt32(Console.ReadLine());
+                            validSeat = d.database[num-1].takenSeat(n);
+                        }
+                        /* If that seat has been taken, keep asking customer what seat they would like until they make a valid choice */
+                        while (validSeat==0) {
+                            d.database[num-1].printSeating();
+                            Console.Write("Sorry. That seat is taken. Please select an open seat (Just put the seat number) - ");
+                            n = Convert.ToInt32(Console.ReadLine());
+                            validSeat = d.database[num-1].takenSeat(n);
+                        }
+                        /* Printing out seat number */
+                        Console.WriteLine("");
+                        Console.WriteLine("You have picked seat number: " + n);
+                        d.database[num-1].printSeating();
+                        Writer.ChangeSeat(d.database[num-1]);
+                        Console.WriteLine("");
+                        Console.WriteLine("You are all set and your seat is reserved.");
                     }
-                    /* Printing out seat number */
-                    Console.WriteLine("");
-                    Console.Write("You have picked seat number: " + n);
-                    Console.WriteLine(". You are all set and your seat is reserved.");
                 }
                 /* Determining if user would like to continue to create/book flights */
                 Console.WriteLine("");
                 Console.Write("Would you like to continue? (Y/N) - ");
-                string response = Console.ReadLine();
-                bool equal = String.Equals("Y", response, StringComparison.OrdinalIgnoreCase);
+                response = Console.ReadLine();
+                equal = String.Equals("Y", response, StringComparison.OrdinalIgnoreCase);
                 /* Exiting the program */
                 if (!equal) {
                     c = 1;
