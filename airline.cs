@@ -1,7 +1,7 @@
 ﻿/* 
 Kalin Fleming
 Intel Internship Airline Project
-04/07/2021
+04/09/2021
 Description: This program simulates an Airline website. The user can either be a customer or an administrator. The administrator
 can create flights by inputting different flight descriptions. The program will store all flights into a text file named
 "flights.txt". The administrator can also clear any previous reservations made by customers for all flights.
