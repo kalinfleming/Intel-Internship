@@ -4,7 +4,8 @@ Intel Internship Airline Project
 04/07/2021
 Description: This program simulates an Airline website. The user can either be a customer or an administrator. The administrator
 can create flights by inputting different flight descriptions. The program will store all flights into a text file named
-"flights.txt". The customer can reserve a seat on a flight. The customer will be able to see a list of flights available
+"flights.txt". The administrator can also clear any previous reservations made by customers for all flights.
+The customer can reserve a seat on a flight. The customer will be able to see a list of flights available
 with the relevant descriptions and reserve a seat. If customers attempt to book the same seat in the same program simulation,
 the customer will have to choose a different seat. 
 */
@@ -21,7 +22,7 @@ namespace Intel_Internship
 {
     /* Flight class. This class contains all data pertaining to a flight, function to generate a seating chart,
     function to create a user-friendly string of flight information, function to keep track of seat reservations,
-    and lastly a function to print out a seating chart to the user */
+    a function to print out a seating chart to the user, and lastly a function to clean out all seat reservations for a flight */
     public class Flight
     {
                 public int seatingCapacity;
@@ -97,9 +98,6 @@ namespace Intel_Internship
                             result = 0;
                         }
                     }
-                    if (result != 0) {
-                        result = 1;
-                    }
                     return result;
                 }
 
@@ -138,7 +136,8 @@ namespace Intel_Internship
     }
     
     /* Database class. This class contains a list of all flights, an integer to store
-    the current number of flights, and a function to add a flight to the list */
+    the current number of flights, a function to add a flight to the list, and a 
+    function to call the cleanOut() function for each flight in the database */
     public class Database
     {
         public int numFlights;
@@ -180,7 +179,9 @@ namespace Intel_Internship
     }
     
     /* Writer class. This class writes flight information to the "flights.txt" file in order
-    to maintain a list of flights across program instances */
+    to maintain a list of flights across program instances. The WriteAsynch() function will also
+    create a file that contains a seating chart for each individual flight with a unique file name.
+    This class also contains a function to update seat reservations in each of the unique files */
     public class Writer
     {
         public static async Task WriteAsync(Flight f)
@@ -216,7 +217,8 @@ namespace Intel_Internship
 
     /* Reader class. This class contains a function that will read a list of all past flights
     from the "flights.txt" file and add it to the current database, a function to print out a
-    list of current flights, and a function to print out a specific flight given by the user */
+    list of current flights, a function to print out a specific flight given by the user, and a 
+    function to to read the seating chart from a unique file for each flight */
     public class Reader
     {
         /* Read all flights from text file, add flights to flight database */
@@ -291,7 +293,7 @@ namespace Intel_Internship
             }
             Console.WriteLine("");
         }
-
+        /* Read seating chart from a unique file, update seatChart array in the Flight class accordingly */
         public static void ReadSeating (Database d, Flight f)
         {
             string name = "flight" + f.idNum + ".txt";
@@ -371,6 +373,7 @@ namespace Intel_Internship
                     d.addFlight(myObj);
                     myObj.idNum = d.numFlights;
                     Writer.WriteAsync(myObj);
+                    /* Asking administrator if they would like to re-set all flights. If yes, call the clean function in the database class */
                     Console.Write("Would you like to re-set all flights? This would delete any previous seat reservations, all of the flights would have all open seats. (Y/N) - ");
                     response = Console.ReadLine();
                     equal = String.Equals("Y", response, StringComparison.OrdinalIgnoreCase);
@@ -386,14 +389,40 @@ namespace Intel_Internship
                     cName = Console.ReadLine();
                     Console.Write("Please enter your age - ");
                     cAge = Convert.ToInt32(Console.ReadLine());
-                    /* Printing out flight list, asking customer what flight they would like */
+                    /* Printing out flight list */
                     Reader.ReadAll(d);
+                    /* Checking to see there are no available flights */
                     if (d.numFlights == 0) {
                         Console.WriteLine("Sorry. There are no current flights available. Please come back and check at a later time");
                     }
                     else {
+                        /* Asking customer what flight they would like */
                         Console.Write("Which flight would you like? (Just put the flight number) - ");
                         int num = Convert.ToInt32(Console.ReadLine());
+                        /* Checking if flight number is valid */
+                        if (num > d.numFlights) {
+                            x = 1;
+                        }
+                        while (x==1) {
+                            Console.WriteLine("That is not a valid flight number. Please try again");
+                            Console.Write("Which flight would you like? (Just put the flight number) - ");
+                            num = Convert.ToInt32(Console.ReadLine());
+                            if (num<=d.numFlights) {
+                                x = 0;
+                            }
+                        }
+                        /* Checking if flight is full (all seats are reserved) */
+                        if (d.database[num-1].fullFlight() == 1) {
+                            x = 1;
+                        }
+                        while (x == 1) {
+                            Console.WriteLine("Sorry. That flight is full. Please try again.");
+                            Console.Write("Which flight would you like? (Just put the flight number) - ");
+                            num = Convert.ToInt32(Console.ReadLine());
+                            if (d.database[num-1].fullFlight() == 0) {
+                                x = 0;
+                            }
+                        }
                         /* Printing out specific flight and confirming with customer */
                         Reader.ReadSpecific(d, num);
                         Console.Write("Is this flight correct? (Y/N) - ");
@@ -404,14 +433,15 @@ namespace Intel_Internship
                             Reader.ReadAll(d);
                             Console.Write("Which flight would you like? (Just put the flight number) - ");
                             num = Convert.ToInt32(Console.ReadLine());
-                            if (num >= d.numFlights) {
+                            /* Checking if flight number is valid */
+                            if (num > d.numFlights) {
                                 x = 1;
                             }
                             while (x==1) {
                                 Console.WriteLine("That is not a valid flight number. Please try again");
                                 Console.Write("Which flight would you like? (Just put the flight number) - ");
                                 num = Convert.ToInt32(Console.ReadLine());
-                                if (num<d.numFlights) {
+                                if (num<=d.numFlights) {
                                     x = 0;
                                 }
                             }
@@ -425,7 +455,7 @@ namespace Intel_Internship
                         Console.Write("You may now pick your seat. Which seat number would you like? (Just put the seat number) - ");
                         n = Convert.ToInt32(Console.ReadLine());
                         validSeat = d.database[num-1].takenSeat(n);
-                        /* If that seat has been taken, keep asking customer what seat they would like until they make a valid choice */
+                        /* Checking if that seat number is valid. If not, ask again */
                         while (validSeat==3) {
                             d.database[num-1].printSeating();
                             Console.Write("That is not a valid seat number. Please pick a valid seat (Just put the seat number) - ");
@@ -439,7 +469,7 @@ namespace Intel_Internship
                             n = Convert.ToInt32(Console.ReadLine());
                             validSeat = d.database[num-1].takenSeat(n);
                         }
-                        /* Printing out seat number */
+                        /* Printing out seat number and updated seating chart */
                         Console.WriteLine("");
                         Console.WriteLine("You have picked seat number: " + n);
                         d.database[num-1].printSeating();
