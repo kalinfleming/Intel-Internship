@@ -25,6 +25,7 @@ namespace Intel_Internship
     a function to print out a seating chart to the user, and lastly a function to clean out all seat reservations for a flight */
     public class Flight
     {
+                /* Instance data */
                 public int seatingCapacity;
                 public int pFirst;
                 public int pEconomy;
@@ -35,6 +36,7 @@ namespace Intel_Internship
                 public int idNum;
                 public int[] seatChart;
                 
+                /* General constructor */
                 public Flight()
                 {
                     seatingCapacity = 0;
@@ -45,6 +47,7 @@ namespace Intel_Internship
                     dTime = "Never";
                     aTime = "Never";
                 }
+                /* Specific constructor */
                 public Flight(int sc, int pf, int pe, string da, string aa, string dt, string at)
                 {
                     da = da.ToUpper();
@@ -62,17 +65,20 @@ namespace Intel_Internship
                     }
                 }
 
+                /* Creating seating chart from ReadSeating() in the Reader class */
                 public void createSeatingChart(Database database, Flight f) {
                     f.seatChart = new int[seatingCapacity];
                     Reader.ReadSeating(database, f);
                 }
 
+                /* Returning a string to be printed containing all relevant flight details */
                 public string flightDetails()
                 {
                     string x = "Capacity: " + seatingCapacity + ", 1st Class Ticket Price: " + pFirst + ", Economy Ticket Price: " + pEconomy + ", Departure Airport: " + dAirport + ", Arrival Airport: " + aAirport + ", Departure Time: " + dTime + ", Arrival Time: " + aTime;
                     return x;
                 }
 
+                /* Check to see if seat is valid, taken, or free */
                 public int takenSeat(int x) 
                 {
                     int result = 0;
@@ -90,6 +96,7 @@ namespace Intel_Internship
                     }
                 }
 
+                /* Check to see if each seat is reserved */
                 public int fullFlight() 
                 {
                     int result = 1;
@@ -101,6 +108,7 @@ namespace Intel_Internship
                     return result;
                 }
 
+                /* Print seating chart in a user friendly way */
                 public void printSeating()
                 {
                     string format = "--------------------------------------------------------------------------------------------------------------------------------------------------------------------";
@@ -127,6 +135,7 @@ namespace Intel_Internship
                     Console.WriteLine(format);
                 }
 
+                /* Re-open all seats on a flight */
                 public void cleanOut()
                 {
                     for (int i = 0; i < seatingCapacity; i++) {
@@ -140,19 +149,25 @@ namespace Intel_Internship
     function to call the cleanOut() function for each flight in the database */
     public class Database
     {
+        /* Instance data */
         public int numFlights;
         public List<Flight> database;
+
+        /* Constructor */
         public Database()
         {
             numFlights = 0;
             database = new List<Flight>();
         }
+
+        /* Add a flight to the database */
         public void addFlight(Flight f)
         {
             database.Add(f);
             numFlights++;
         }
 
+        /* Call cleanOut() function in Flight class on each flight in the database */
         public void clean()
         {
             for (int i = 0; i < numFlights; i++) {
@@ -164,13 +179,11 @@ namespace Intel_Internship
     /* Customer class. This class contains a customer's information such as the name and age */
     public class Customer
     {
+        /* Instance data */
         public string name;
         public int age;
-        public Customer()
-        {
-            name = "John Doe";
-            age = 0;
-        }
+
+        /* Constructor */
         public Customer(string n, int a)
         {
             name = n;
@@ -184,10 +197,11 @@ namespace Intel_Internship
     This class also contains a function to update seat reservations in each of the unique files */
     public class Writer
     {
-        public static async Task WriteAsync(Flight f)
+        /* Write each new flight to the flights.txt file. Create a new file for each flight containing the seating chart */
+        public static void Write(Flight f)
         {
             using StreamWriter file = new("flights.txt", append: true);
-            await file.WriteLineAsync(f.seatingCapacity + " " + f.pFirst + " " + f.pEconomy + " " + f.dAirport + " " + f.aAirport + " " + f.dTime + " " + f.aTime);
+            file.WriteLine(f.seatingCapacity + " " + f.pFirst + " " + f.pEconomy + " " + f.dAirport + " " + f.aAirport + " " + f.dTime + " " + f.aTime);
             string name = "flight" + f.idNum + ".txt";
             using (FileStream fs = new FileStream(name, FileMode.Create))
             {
@@ -200,7 +214,8 @@ namespace Intel_Internship
             }
         }
 
-        public static async Task ChangeSeat(Flight f)
+        /* Updating the seating chart in the specified file */
+        public static void ChangeSeat(Flight f)
         {
             string name = "flight" + f.idNum + ".txt";
             using (FileStream fs = new FileStream(name, FileMode.Create))
@@ -221,7 +236,7 @@ namespace Intel_Internship
     function to to read the seating chart from a unique file for each flight */
     public class Reader
     {
-        /* Read all flights from text file, add flights to flight database */
+        /* Read all flights from text file, add flights to flight database, create a seating chart for each flight from their files */
         public static void firstRead(Database d)
         {
             int count = 0;
@@ -372,7 +387,7 @@ namespace Intel_Internship
                     Flight myObj = new Flight(capacity, fticket, eticket, dairport, aairport, dtime, atime);
                     d.addFlight(myObj);
                     myObj.idNum = d.numFlights;
-                    Writer.WriteAsync(myObj);
+                    Writer.Write(myObj);
                     /* Asking administrator if they would like to re-set all flights. If yes, call the clean function in the database class */
                     Console.Write("Would you like to re-set all flights? This would delete any previous seat reservations, all of the flights would have all open seats. (Y/N) - ");
                     response = Console.ReadLine();
